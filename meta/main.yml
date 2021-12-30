@@ -1,0 +1,20 @@
+galaxy_info:
+  role_name: "ansible-origins"
+  author: "GolovanovSV <golovanovsv@gmail.com>"
+  description: "An [Ansible](https://www.ansible.com) role to define a base configuration state"
+  license: MIT
+  min_ansible_version: 2.7
+  dependencies: []
+  platforms:
+    - name: Debian
+      version:
+        - stretch
+        - buster
+        - bullseye
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
+    - name: Amazon
+      versions:
+        - all

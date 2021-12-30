@@ -1,0 +1,32 @@
+- name: "Create dirs | servers-extra-configs"
+  file:
+    path: "{{ item.path }}"
+    mode: "{{ item.mode|default('0755') }}"
+    owner: "{{ item.owner|default('root') }}"
+    group: "{{ item.group|default('root') }}"
+    state: "directory"
+  loop: "{{ extra_dirs }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.state|default('present') == "present"
+
+- name: "Put text files | servers-extra-configs"
+  copy:
+    content: "{{ item.config }}"
+    dest: "{{ item.path }}"
+    mode: "{{ item.mode|default('0644') }}"
+    owner: "{{ item.owner|default('root') }}"
+    group: "{{ item.group|default('root') }}"
+  loop: "{{ extra_configs }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.state|default('present') == "present"
+
+- name: "Remove text files | servers-extra-configs"
+  file:
+    path: "{{ item.path }}"
+    state: "absent"
+  loop: "{{ extra_configs + extra_dirs }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.state|default('present') == "absent"

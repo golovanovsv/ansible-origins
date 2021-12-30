@@ -1,0 +1,32 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+  - name: "include ansible-servers vars"
+    include_vars:
+      file: "vars.yml"
+  
+  - name: "install software | apt"
+    apt:
+      name: "{{ item }}"
+      state: "present"
+      update_cache: true
+    loop:
+    - tzdata
+    - tar
+    - unzip
+    when: ansible_pkg_mgr == "apt"
+
+  - name: "install software | yum"
+    yum:
+      name: "{{ item }}"
+      state: "present"
+    loop:
+    - tzdata
+    - tar
+    - unzip
+    when: ansible_pkg_mgr == "yum"
+
+  - name: "basic"
+    include_role:
+      name: "basic"

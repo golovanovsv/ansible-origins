@@ -1,0 +1,58 @@
+repositories_apt:
+- repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+  key: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+  state: "present"
+
+extra_software:
+- iotop
+- nginx
+
+extra_pip_software:
+- s3cmd
+- boto3
+
+extra_sudoers_configs:
+- name: "aliens"
+  content: |
+    aliens ALL=(ALL) ALL
+- name: "predators"
+  content: |
+    predators ALL=(ALL) ALL
+
+users:
+- login: "anny"
+  passwd: "$6$C1o0jHxqRgDsJRRU$W7kMcbL5X.rddAPgOycc1ozAhcb4QCDXzzKviJV.Y.cmhv8pmqlMVKvjQmfoJccF87LNVVd7IrQrUD3BdB5BA1"
+  description: "Anny admin"
+  state: "present"
+  ssh_keys:
+  - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQCvSoOl696VC7uyLikfSMtATlZeZt7FQqdct+lN7jLdvJRtkMDkzniTIRfAmrOzbrV0ma4DWMznG2h5cwUgs4M3J1D42zOjZtBOIro89P1wKOt2GDigXX7CsCfqYNvRHrnjhOpjT2bPffu+LBI6/VRMXe/j/WYsIKZZkEW0hcHtGQ== anny@work"
+  - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC1dLN12gWXYhvnf+tfBKvOMflaTyoZ/VW1sEgZ5FeqYtN1zGHx6luAfNTaV4qUNpvbpHvKAzxv4YjV4ku8YG1xHNMGNlc7A0fqfwULguOHEsLpHeYEmUekWTZbopZn1ncNsfyeehKf/p3f8j6kS8L3aBmJw+8+6qlGQBxq+ksSw0ueuzKW5oRBkUfL2b+2L2pd40C8c9wIjf+B6QTmgj3ZjIdxWhXP2zQMS8J4I/gYQ+ydHk2mH9/K/m7HJgzDH/u8xt81TUVTdla/bCxctrUJydcyf77qUSCYejsbJf9JPh/6OFmz7LyBnYXgNeTCAdKN/evVi69nAo1kJ9cSH5V3 anny@home"
+  dirs:
+  - dir: ".test_dir"
+    mode: "0644"
+  - dir: ".test_dir2"
+    mode: "0700"
+  configs:
+  - src: |
+      Config test file content
+    dst: ".test_dir/test_config"
+    inline: true
+  groups:
+  - sudo
+- login: "danny"
+  description: "Danny junior admin"
+  shell: "zsh"
+- login: "evil"
+  state: "absent"
+
+dns_servers:
+- 8.8.8.8
+- 1.1.1.1
+
+dns_timeout: 10
+
+timezone: "Europe/Moscow"
+
+ntp_servers:
+- time.google.com
+- pool.ntp.org

@@ -1,0 +1,66 @@
+- name: "Set default ntp service name | servers-ntp"
+  set_fact:
+    ntp_service_name: "{{ ntp_service[ansible_os_family|lower]|default(ntp_service.default) }}"
+
+- name: "Check systemd-timesyncd | servers-ntp"
+  stat:
+    path: "/etc/systemd/timesyncd.conf"
+  register: systemd_ntp
+
+- name: "Configure systemd-timesyncd | servers-ntp"
+  block:
+    - name: "Delete ntpd cordon | servers-ntp"
+      file:
+        path: "/lib/systemd/system/systemd-timesyncd.service.d/disable-with-time-daemon.conf"
+        state: "absent"
+      notify: restart-systemd-tymesyncd
+
+    - name: "Get ntpd status | servers-ntp"
+      service_facts:
+
+    - name: "Disable ntpd | servers-ntp"
+      systemd:
+        name: "{{ ntp_service_name }}"
+        state: "stopped"
+        enabled: "no"
+      when: ntp_service_name in ansible_facts.services
+
+    - name: "Make /etc/systemd/timesyncd.conf | servers-ntp"
+      template:
+        src: "systemd-timesyncd.conf.j2"
+        dest: "/etc/systemd/timesyncd.conf"
+        owner: "root"
+        group: "root"
+        mode: "0644"
+      when: ntp_servers
+      notify: restart-systemd-tymesyncd
+
+    - name: "Start systemd-timesyncd | servers-ntp"
+      systemd:
+        name: "systemd-timesyncd"
+        state: "started"
+        enabled: "yes"
+  when: systemd_ntp.stat.exists
+
+- name: "Check ntpd.conf | servers-ntp"
+  stat:
+    path: "/etc/ntp.conf"
+  register: ntp
+
+- name: "Configure ntpd | servers-ntp"
+  block:
+    - name: "Make /etc/ntp.conf | servers-ntp"
+      template:
+        src: "ntp.conf.j2"
+        dest: "/etc/ntp.conf"
+        owner: "root"
+        group: "root"
+        mode: "0644"
+      notify: restart-ntpd
+
+    - name: "Start ntp service | servers-ntp"
+      service:
+        name: "{{ ntp_service_name }}"
+        state: "started"
+        enabled: "yes"
+  when: ntp.stat.exists

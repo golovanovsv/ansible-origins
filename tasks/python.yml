@@ -1,0 +1,89 @@
+- name: "Finding python2 | servers-python"
+  shell: "which python2 || RC=0"
+  register: python2_result
+  changed_when: false
+
+- name: "Finding pip2 | servers-python"
+  shell: "which pip2 || RC=0"
+  register: pip2_result
+  when: python2_result.stdout_lines|length>0
+  changed_when: false
+
+- name: "Finding python3 | servers-python"
+  shell: "which python3 || RC=0"
+  register: python3_result
+  changed_when: false
+
+- name: "Finding pip3 | servers-python"
+  shell: "which pip3 || RC=0"
+  register: pip3_result
+  changed_when: false
+
+- name: "Install python-setuptools | apt"
+  apt:
+    name: "python-setuptools"
+  when: python2_result.stdout_lines|length>0 and ansible_pkg_mgr == "apt"
+
+- name: "Install python-setuptools | yum"
+  yum:
+    name: "python2-setuptools"
+  when: python2_result.stdout_lines|length>0 and ansible_pkg_mgr == "yum"
+
+- name: "Install python3-setuptools | apt"
+  apt:
+    name: "python3-setuptools"
+  when: python3_result.stdout_lines|length>0 and ansible_pkg_mgr == "apt"
+
+- name: "Install python3-setuptools | yum"
+  yum:
+    name: "{{ item }}"
+  loop:
+    - "python34-setuptools"
+  when: python3_result.stdout_lines|length>0 and ansible_pkg_mgr == "yum"
+  ignore_errors: true
+
+- name: "Install pip | servers-python"
+  block:
+    - name: "Download pip installer | servers-python"
+      get_url:
+        url: "https://bootstrap.pypa.io/pip/2.7/get-pip.py"
+        dest: "/tmp/get-pip.py"
+      when: python2_result.stdout_lines|length>0
+
+    - name: "Download pip installer | servers-python"
+      get_url:
+        url: "https://bootstrap.pypa.io/get-pip.py"
+        dest: "/tmp/get-pip.py"
+      when: python3_result.stdout_lines|length>0
+
+    - name: "Install pip2 | servers-python"
+      command: "{{ python2_result.stdout_lines[0] }} /tmp/get-pip.py"
+      when: python2_result.stdout_lines|length>0 and pip2_result.stdout_lines|length==0
+      register: pip2_installed
+
+    - name: "Install pip3 | servers-python"
+      command: "{{ python3_result.stdout_lines[0] }} /tmp/get-pip.py"
+      when: python3_result.stdout_lines|length>0 and pip3_result.stdout_lines|length==0
+      register: pip3_installed
+  when: >
+    update_pip or
+    ( python2_result.stdout_lines|length>0 and pip2_result.stdout_lines|length==0 ) or
+    ( python3_result.stdout_lines|length>0 and pip3_result.stdout_lines|length==0 )
+
+- name: "Install pip2 packages"
+  pip:
+    executable: "pip2"
+    name: "{{ common_pip_software + extra_pip_software }}"
+  when: >
+    pip2_installed.changed or ( pip2_result.stdout_lines is defined and pip2_result.stdout_lines|length>0 )
+  environment:
+    PATH: "/usr/bin:/usr/local/bin"
+
+- name: "Install pip3 packages"
+  pip:
+    executable: "pip3"
+    name: "{{ common_pip_software + extra_pip_software }}"
+  when: >
+    pip3_installed.changed or ( pip3_result.stdout_lines is defined and pip3_result.stdout_lines|length>0 )
+  environment:
+    PATH: "/usr/bin:/usr/local/bin"

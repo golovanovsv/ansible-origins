@@ -1,0 +1,17 @@
+# Managed by Ansible
+# {{ ansible_managed }}
+#
+
+Defaults        env_reset
+Defaults        mail_badpass
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+
+# User privilege specification
+root    ALL=(ALL:ALL) ALL
+
+# Group privilege specification
+%sudo  ALL=(ALL:ALL) NOPASSWD: ALL
+%admin ALL=(ALL:ALL) NOPASSWD: ALL
+%wheel ALL=(ALL:ALL) NOPASSWD: ALL
+
+#includedir /etc/sudoers.d

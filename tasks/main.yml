@@ -1,0 +1,99 @@
+# Настраиваем sysctl
+# Первый пункт для того, чтобы успеть отключить IPv6 например :)
+- name: "Configure systcl | servers-sysctl"
+  import_tasks: "sysctl.yml"
+  become: true
+  tags:
+  - sysctl
+
+# Настраиваем swap
+- name: "Configure swap | servers-swap"
+  import_tasks: "swap.yml"
+  become: true
+  tags:
+  - swap
+
+# Устанавливаем софт
+- name: "Install software | servers-soft"
+  import_tasks: "software.yml"
+  become: true
+  tags:
+  - soft
+
+# Устанавливаем и настраиваем python
+- name: "Install python | servers-python"
+  import_tasks: "python.yml"
+  become: true
+  tags:
+  - python
+
+# Параметры доступа к sudo
+- name: "Configure sudoers | servers-sudoers"
+  import_tasks: "sudoers.yml"
+  become: true
+  tags:
+  - sudoers
+
+# Создание и настройка пользователей сервера
+- name: "Configure users | servers-users"
+  import_tasks: "users/main.yml"
+  tags:
+  - users
+
+# Настраиваем motd
+- name: "Configure motd | servers-motd"
+  import_tasks: "motd/main.yml"
+  tags:
+  - motd
+
+# Настраиваем hostname
+- name: "Configure hostname | servers-hostname"
+  import_tasks: "hostname.yml"
+  become: true
+  tags:
+  - hostname
+
+# Настраиваем timezone
+- name: "Configure timezone | servers-timezone"
+  import_tasks: "timezone.yml"
+  become: true
+  tags:
+  - timezone
+
+# Настраиваем ntp
+- name: "Configure ntp | servers-ntp"
+  import_tasks: "ntpd.yml"
+  become: true
+  when: ntp_servers|length>0
+  tags:
+  - ntp
+
+# Настраиваем resolv.conf
+- name: "Configure resolve.conf | servers-dns"
+  import_tasks: "resolv.yml"
+  become: true
+  when: dns_servers|length>0
+  tags:
+  - dns
+
+# Настраиваем locales
+- name: "Generate locales | servers-locales"
+  import_tasks: "locales.yml"
+  become: true
+  tags:
+  - locales
+
+# Настраиваем extra configs
+- name: "Configure extra-configs | servers-extra-configs"
+  import_tasks: "extra_configs.yml"
+  become: true
+  tags:
+  - extra_configs
+
+# Настраиваем мониторинг сервера
+- name: "Configure monitoring | servers-monitoring"
+  import_tasks: "monitoring/main.yml"
+  become: true
+  when: node_exporter_enabled
+  tags:
+  - monitoring

@@ -1,0 +1,60 @@
+- name: "Install software | apt | servers-soft"
+  block:
+  - name: "Update repositories keys | apt | servers-soft"
+    apt_key:
+      url: "{{ item.key }}"
+      state: "{{ item.state|default('present') }}"
+    loop: "{{ repositories_apt }}"
+
+  - name: "Update repositories list | apt | servers-soft"
+    apt_repository:
+      repo: "{{ item.repo }}"
+      state: "{{ item.state|default('present') }}"
+    loop: "{{ repositories_apt }}"
+
+  - name: "Install packages | apt | servers-soft"
+    apt:
+      update_cache: true
+      name: "{{ item }}"
+      state: "present"
+    loop:
+      - "{{ common_software }}"
+      - "{{ common_apt_software }}"
+      - "{{ extra_software }}"
+
+  - name: "Get holded packages | apt | servers-soft"
+    command: "apt-mark showhold"
+    register: holded_pkgs
+    changed_when: false
+
+  - name: "Set hold mark for packages | apt | servers-soft"
+    command: "apt-mark hold {{ item }}"
+    loop: "{{ locked_software }}"
+    when: item not in holded_pkgs.stdout_lines
+  when: ansible_pkg_mgr == "apt"
+
+- name: "Install software | yum | servers-soft"
+  block:
+    # Возможно это не оптимально
+    #  Но согласно манифесту роли это должно просто работать на amazon linux :)
+    - name: "Enable epel | yum | servers-soft"
+      yum_repository:
+        name: "epel"
+        file: "epel"
+        description: "Extra Packages for Enterprise Linux 7 - $basearch"
+        metalink: "https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
+        baseurl: "http://download.fedoraproject.org/pub/epel/7/$basearch"
+        # TODO: enable GPG key
+        # gpgkey: ""
+        gpgcheck: "no"
+        state: "present"
+
+    - name: "Install packages | yum | servers-soft"
+      yum:
+        name: "{{ item }}"
+        state: "present"
+      loop:
+        - "{{ common_software }}"
+        - "{{ common_yum_software }}"
+        - "{{ extra_software }}"
+  when: ansible_pkg_mgr == "yum"

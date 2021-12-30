@@ -1,0 +1,10 @@
+# /etc/resolv.conf
+# {{ ansible_managed }}
+# ===================================================
+
+options timeout:{{ dns_timeout | default(5) }}
+options edns0
+
+{% for entry in dns_servers %}
+nameserver {{ entry }}
+{% endfor%}

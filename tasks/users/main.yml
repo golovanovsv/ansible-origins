@@ -1,0 +1,32 @@
+- name: "Get OS group list | servers-user"
+  shell: "cat /etc/group | awk -F':' '{print $1}'"
+  register: ugroup_raw
+  changed_when: false
+
+- name: "Get server default shells list | servers-user"
+  command: "cat /etc/shells"
+  register: server_shells
+  changed_when: false
+
+- name: "Searching shells | servers-user"
+  set_fact:
+    default_shell: "{{ server_shells.stdout|regex_search('.*/'+ default_shell + '.*') }}"
+    default_server_shell: "{{ server_shells.stdout_lines[1] }}"
+
+- name: "Select default shell for server | servers-user"
+  set_fact:
+    default_shell: "{{ (default_shell|length>0) | ternary(default_shell, default_server_shell) }}"
+
+- name: "Define system groups array | servers-user"
+  set_fact:
+    ugroups: "{{ ugroup_raw.stdout_lines }}"
+
+- block:
+    - include_tasks: user.yml
+      loop: "{{ users | default([]) + global_users | default([]) }}"
+      loop_control:
+        loop_var: user
+        label: "{{ user.login }}"
+      tags:
+        - users
+  become: true

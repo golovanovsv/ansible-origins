@@ -1,0 +1,64 @@
+- name: "Search shell \"{{ user.shell }}\" for user | {{ user.login }} | servers-user"
+  set_fact:
+    user_shell: "{{ server_shells.stdout|regex_search('.*/'+ user.shell|default('bash') + '.*') }}"
+    user_state: "{{ user.state | default('present') }}"
+
+- name: "Select shell for user | {{ user.login }} | servers-user"
+  set_fact:
+    user_shell: "{{ (user_shell|length>0) | ternary(user_shell, default_shell) }}"
+
+- name: "Create user with shell \"{{ user_shell }}\" | {{ user.login }} | servers-user"
+  user:
+    name: "{{ user.login }}"
+    comment: "{{ user.description | default('') }}"
+    shell: "{{ user_shell }}"
+    state: "{{ user_state }}"
+  register: user_info
+
+- name: "Create personal dirs | {{ user.login }} | servers-user"
+  file:
+    path: "{{ user_info.home }}/{{ item.dir }}"
+    state: directory
+    owner: "{{ user.login }}"
+    group: "{{ user.login }}"
+    mode: "{{ item.mode | default('0644') }}"
+  loop: "{{ user.dirs }}"
+  when: user.dirs is defined and user.dirs|length > 0 and user_state == 'present'
+
+- name: "Set user password | {{ user.login }} | servers-user"
+  user:
+    name: "{{ user.login }}"
+    password: "{{ user.passwd }}"
+  when: user.passwd is defined and user_state == 'present'
+
+- name: "Remove homedir | {{ user.login }} | servers-user"
+  file:
+    path: "/home/{{ user.login }}"
+    state: absent
+  when: user_state == 'absent'
+
+- block:
+    - name: "Add user to groups | {{ user.login }} | servers-user"
+      user:
+        name: "{{ user.login }}"
+        append: true
+        groups: "{{ item }}"
+      loop: "{{ user.groups|default([]) }}"
+      when: item in ugroups
+
+    - name: "Configure public keys | {{ user.login }} | servers-user"
+      authorized_key:
+        user: "{{ user.login }}"
+        key: "{{ lookup('url', item) if item | urlsplit('hostname') | mandatory else item }}"
+      loop: "{{ user.ssh_keys }}"
+      loop_control:
+        label: "{{ user.login }}"
+      when: user.ssh_keys is defined
+
+    - name: "Transfer configs | {{ user.login }} | servers-user"
+      include_tasks: user_config.yml
+      loop: "{{ user.configs }}"
+      loop_control:
+        loop_var: config
+      when: config is defined
+  when: user_state == 'present'

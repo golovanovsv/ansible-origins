@@ -1,0 +1,21 @@
+- name: "Motd for ubuntu | servers-motd"
+  import_tasks: "ubuntu.yml"
+  when: ansible_distribution == "Ubuntu"
+  become: true
+
+- name: "Motd for debian | servers-motd"
+  block:
+  - name: "Motd for debian 10 | servers-motd"
+    import_tasks: "ubuntu.yml"
+    when: ansible_distribution_version in ["9", "10"]
+
+  - name: "Motd for debian other | servers-motd"
+    import_tasks: "common.yml"
+    when: ansible_distribution_version not in ["9", "10"]
+  when: ansible_distribution == "Debian"
+  become: true
+
+- name: "Common motd | servers-motd"
+  import_tasks: "common.yml"
+  when: ansible_distribution not in ['Ubuntu', 'Debian']
+  become: true

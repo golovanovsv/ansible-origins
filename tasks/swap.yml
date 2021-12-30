@@ -1,0 +1,28 @@
+- name: "Get swap status | servers-swap"
+  shell: "cat /proc/swaps | grep -v Filename | wc -l"
+  register: swap_status
+  changed_when: false
+
+- name: "Enable swap | servers-swap"
+  block:
+    - name: "Enable swap in /etc/fstab | servers-swap"
+      replace:
+        path: "/etc/fstab"
+        regexp: '^# (.+?\sswap\s+sw\s+.*)$'
+        replace: '\1'
+
+    - name: "Enable swap for all devices | servers-swap"
+      command: "swapon -a"
+  when: swap_enabled and swap_status.stdout == 0
+
+- name: "Disable swap | servers-swap"
+  block:
+    - name: "Disable swap for all devices | servers-swap"
+      command: "swapoff -a"
+
+    - name: "Disable swap in /etc/fstab | server-swap"
+      replace:
+        path: "/etc/fstab"
+        regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+        replace: '# \1'
+  when: not swap_enabled and swap_status.stdout != 0

@@ -1,0 +1,49 @@
+- name: "Create prometheus user | servers-monitoring"
+  user:
+    name: "prometheus"
+    comment: "Prometheus monitoring user"
+    shell: "/bin/false"
+    create_home: false
+    home: "{{ node_exporter_base_dir }}"
+
+- name: "Create monitoring dirs | servers-monitoring"
+  file:
+    path: "{{ item }}"
+    mode: "0755"
+    state: "directory"
+    owner: "prometheus"
+    group: "prometheus"
+    recurse: true
+  loop:
+    - "{{ node_exporter_text_collector_dir }}"
+
+- name: "Get node-exporter archive | servers-monitoging"
+  get_url:
+    url: "{{ node_exporter_get_url }}"
+    dest: "{{ node_exporter_base_dir }}/node_exporter-{{ node_exporter_version }}.tgz"
+  register: node_exporter_get_url
+
+- name: "Update node-exporter bin | servers-monitoring"
+  block:
+    - name: "Make temp directory for node-exporter unarchive | servers-monitoring"
+      file:
+        path: "/tmp/node_exporter-{{ node_exporter_version }}"
+        mode: 0755
+        state: directory
+        owner: prometheus
+        group: prometheus
+
+    - name: "Unarchive node_exporter | servers-monitoring"
+      unarchive:
+        src: "{{ node_exporter_base_dir }}/node_exporter-{{ node_exporter_version }}.tgz"
+        dest: "/tmp/node_exporter-{{ node_exporter_version }}"
+        remote_src: true
+
+    - name: "Copy node-exporter binary to working dir | servers-monitoring"
+      copy:
+        src: "/tmp/node_exporter-{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+        dest: "{{ node_exporter_base_dir }}/node_exporter"
+        mode: 0755
+        remote_src: true
+      notify: restart-node-exporter
+  when: node_exporter_get_url.changed

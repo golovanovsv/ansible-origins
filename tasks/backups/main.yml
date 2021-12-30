@@ -1,0 +1,26 @@
+- name: "Include backup driver | servers-backups"
+  include_tasks: "{{ backup.type }}"
+  when: backup is defined and backup.type is defined
+
+- name: "Get backup user home | servers-backups"
+  set_fact:
+    backup_user_home: "{{ lookup('env', 'HOME') }}"
+  become: true
+  become_user: "{{ backup.user }}"
+  when: backup.type in ["scp", "borg"]
+
+- name: "Add ssh key for backup user | servers-backups"
+  copy:
+    content: "{{ backup.key }}"
+    dest: "{{ user_result.results }}/.ssh/backup_rsa"
+    mode: "0600"
+    owner: "{{ backup.user }}"
+    group: "{{ backup.user }}"
+  when: backup.type in ["scp", "borg"]
+
+- name: "Archive files | servers-backups"
+  archive:
+    path: "{{ backup.dirs }}"
+    exclude_path: "{{ backup.exclude_dirs }}"
+    dest: "{{ backup.tmp_dir }}/{{ ansible_hostname }}-"
+    mode: "0644"

@@ -1,0 +1,24 @@
+- name: "Create sudo group if does not exist | server-sudoers"
+  group:
+    name: "sudo"
+    system: true
+
+- name: "Copy /etc/sudoers | server-sudoers"
+  template:
+    src: "sudoers.j2"
+    dest: "/etc/sudoers"
+    mode: "0440"
+
+- name: "Create /etc/sudoers.d dir for extra configs | server-sudoers"
+  file:
+    path: "/etc/sudoers.d"
+    state: "directory"
+    mode: "0750"
+
+- name: "Put extra sudoers files in /etc/sudoers.d | server-sudoers"
+  copy:
+    content: "{{ item.content }}"
+    dest: "/etc/sudoers.d/{{ item.name }}"
+    mode: "0440"
+  with_items:
+    - "{{ extra_sudoers_configs }}"

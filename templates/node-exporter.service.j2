@@ -1,0 +1,39 @@
+# Managed by Ansible
+[Unit]
+Description=Node exporter
+After=network.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/node_exporter.pid
+User={{ 'prometheus' if node_exporter_deployment_type == 'host' else 'root' }}
+Group={{ 'prometheus' if node_exporter_deployment_type == 'host' else 'root' }}
+LimitNOFILE=65535
+{% if node_exporter_deployment_type == 'host' %}
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart={{ node_exporter_base_dir }}/node_exporter \
+  --web.listen-address={{ node_exporter_listen_host }}:{{ node_exporter_listen_port }} \
+  --collector.textfile.directory="{{ node_exporter_text_collector_dir }}" \
+{% endif %}
+{% if node_exporter_deployment_type == 'docker' %}
+ExecReload=docker exec -it node-exporter /bin/kill -HUP 1
+ExecStart="docker run --rm -d --name node-exporter --hostname node-exporter \
+  --network host --pid host \
+  -v "/:/host:ro" \
+  -v "{{ node_exporter_text_collector_dir }}:{{ node_exporter_text_collector_dir }}" \
+  --path.rootfs=/host \
+  --web.listen-address={{ node_exporter_listen_host }}:{{ node_exporter_listen_port }} \
+  --collector.textfile.directory="{{ node_exporter_text_collector_dir }}" \
+{% endif %}
+{% for collector in node_exporter_collectors %}
+  --collector.{{ collector }} \
+{% endfor -%} 
+{% for collector_option in node_exporter_collectors_options %}
+  {{ collector_option }} \
+{% endfor %}
+
+SyslogIdentifier=node_exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+- name: "Update sysctl settings | servers-sysctl"
+  sysctl:
+    name: "{{ item.split('=')[0] }}"
+    value: "{{ item.split('=')[1] }}"
+    state: "present"
+  loop: "{{ sysctl }}"

@@ -1,0 +1,51 @@
+dependency:
+  name: galaxy
+driver:
+  name: docker
+# 503 is feature-bug - https://github.com/ansible/ansible-lint/issues/419
+lint: "ansible-lint . -x 306 -x 503 --exclude .gitlab-ci.yml"
+platforms:
+  - name: ubuntu-2004
+    image: golovanovsv/ubuntu:20.04-systemd
+    command: /lib/systemd/systemd
+    pre_build_image: true
+    privileged: true
+  - name: ubuntu-1804
+    image: golovanovsv/ubuntu:18.04-systemd
+    command: /lib/systemd/systemd
+    pre_build_image: true
+    privileged: true
+  - name: debian-9
+    image: golovanovsv/debian:9-systemd
+    pre_build_image: true
+    privileged: true
+  - name: debian-10
+    image: golovanovsv/debian:10-systemd
+    pre_build_image: true
+    privileged: true
+  - name: amazon2
+    image: golovanovsv/amazon:2-systemd
+    command: /lib/systemd/systemd
+    pre_build_image: true
+    privileged: true
+provisioner:
+  name: ansible
+  log: true
+  config_options:
+    defaults:
+      interpreter_python: "python3"
+  inventory:
+    host_vars:
+      amazon2:
+        ansible_python_interpreter: "/usr/bin/python2"
+  ansible_args:
+    # Для docker-драйвера /etc/hosts read-only
+    - --skip-tags=hostname
+    # Для docker-драйвера /etc/resolv.conf read-only
+    - --skip-tags=dns
+verifier:
+  name: testinfra
+  directory: ../../tests
+  # Uncomment for view print() results
+  # options:
+  #   s: true

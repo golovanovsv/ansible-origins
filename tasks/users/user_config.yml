@@ -1,0 +1,35 @@
+- name: "Get some facts about user | {{ user.login }} | servers-user"
+  set_fact:
+    is_url: "{{ true if config.src | urlsplit('hostname') | mandatory else false }}"
+    dest: "/home/{{ user.login }}/{{ config.dst }}"
+  changed_when: false
+
+- name: "Transfer content | {{ user.login }} | content {{ dest }} | servers-user"
+  copy:
+    content: "{{ config.src }}"
+    dest: "{{ dest }}"
+    owner: "{{ user.login }}"
+    group: "{{ user.login }}"
+    mode: "{{ config.mode | default('0644') }}"
+  ignore_errors: true
+  when: not is_url and config.inline|default(false)
+
+- name: "Transfer configs | {{ user.login }} | copy {{ dest }} | servers-user"
+  copy:
+    src: "{{ config.src }}"
+    dest: "{{ dest }}"
+    owner: "{{ user.login }}"
+    group: "{{ user.login }}"
+    mode: "{{ config.mode | default('0644') }}"
+  ignore_errors: true
+  when: not is_url and not config.inline|default(false)
+
+- name: "Transfer configs | {{ user.login }} | download {{ dest }} | servers-user"
+  get_url:
+    url: "{{ config.src }}"
+    dest: "{{ dest }}"
+    owner: "{{ user.login }}"
+    group: "{{ user.login }}"
+    mode: "{{ config.mode | default('0644') }}"
+  ignore_errors: true
+  when: is_url
