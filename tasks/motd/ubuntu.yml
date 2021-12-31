@@ -13,5 +13,6 @@
     state: "absent"
   with_items:
     - "10-help-text"
+    - "10-uname"
     - "51-cloudguest"
     - "50-motd-news"

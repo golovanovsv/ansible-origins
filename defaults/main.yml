@@ -58,7 +58,7 @@ default_motd: |
   Welkome to {{ ansible_hostname }} server ;)
 
 ### Таймзона
-# default_timezone: "Europe/Moscow"
+# timezone: "Europe/Moscow"
 default_timezone: "UTC"
 
 ### Настройки DNS
