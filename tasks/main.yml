@@ -13,6 +13,14 @@
   tags:
   - swap
 
+# Настраиваем resolv.conf
+- name: "Configure resolve.conf | servers-dns"
+  import_tasks: "resolv.yml"
+  become: true
+  when: dns_servers|length>0
+  tags:
+  - dns
+
 # Устанавливаем софт
 - name: "Install software | servers-soft"
   import_tasks: "software.yml"
@@ -67,14 +75,6 @@
   when: ntp_servers|length>0
   tags:
   - ntp
-
-# Настраиваем resolv.conf
-- name: "Configure resolve.conf | servers-dns"
-  import_tasks: "resolv.yml"
-  become: true
-  when: dns_servers|length>0
-  tags:
-  - dns
 
 # Настраиваем locales
 - name: "Generate locales | servers-locales"

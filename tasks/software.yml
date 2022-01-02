@@ -5,6 +5,7 @@
       url: "{{ item.key }}"
       state: "{{ item.state|default('present') }}"
     loop: "{{ repositories_apt }}"
+    when: item.key is defined
 
   - name: "Update repositories list | apt | servers-soft"
     apt_repository:
