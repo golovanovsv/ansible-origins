@@ -18,6 +18,8 @@
       update_cache: true
       name: "{{ item }}"
       state: "present"
+      force: true
+      install_recommends: false
     loop:
       - "{{ common_software }}"
       - "{{ common_apt_software }}"
