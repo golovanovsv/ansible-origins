@@ -98,7 +98,6 @@ common_software:
 
 common_apt_software:
   - atop
-  - aufs-tools
   - apt-transport-https
   - dnsutils
   - conntrack
