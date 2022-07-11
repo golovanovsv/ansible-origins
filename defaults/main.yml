@@ -168,7 +168,7 @@ ntp_service:
 
 ### Настройка мониторинга
 # Пока что поддерживается только prometheus
-node_exporter_enabled: true
+node_exporter_enabled: false
 # possible values: host, docker
 node_exporter_deployment_type: "host"
 node_exporter_version: 1.3.1
