@@ -1,11 +1,11 @@
 - name: "Search shell \"{{ user.shell }}\" for user | {{ user.login }} | servers-user"
   set_fact:
-    user_shell: "{{ server_shells.stdout|regex_search('.*/'+ user.shell|default('bash') + '.*') }}"
+    user_shell: "{{ server_shells.stdout | regex_search('.*/'+ user.shell | default('bash') + '.*') }}"
     user_state: "{{ user.state | default('present') }}"
 
 - name: "Select shell for user | {{ user.login }} | servers-user"
   set_fact:
-    user_shell: "{{ (user_shell|length>0) | ternary(user_shell, default_shell) }}"
+    user_shell: "{{ (user_shell | length>0) | ternary(user_shell, default_shell) }}"
 
 - name: "Create user with shell \"{{ user_shell }}\" | {{ user.login }} | servers-user"
   user:
@@ -23,7 +23,7 @@
     group: "{{ user.login }}"
     mode: "{{ item.mode | default('0644') }}"
   loop: "{{ user.dirs }}"
-  when: user.dirs is defined and user.dirs|length > 0 and user_state == 'present'
+  when: user.dirs is defined and user.dirs | length > 0 and user_state == 'present'
 
 - name: "Set user password | {{ user.login }} | servers-user"
   user:
@@ -37,13 +37,14 @@
     state: absent
   when: user_state == 'absent'
 
-- block:
+- name: "Configure user | {{ user.login }} | servers-user"
+  block:
     - name: "Add user to groups | {{ user.login }} | servers-user"
       user:
         name: "{{ user.login }}"
         append: true
         groups: "{{ item }}"
-      loop: "{{ user.groups|default([]) }}"
+      loop: "{{ user.groups | default([]) }}"
       when: item in ugroups
 
     - name: "Configure public keys | {{ user.login }} | servers-user"

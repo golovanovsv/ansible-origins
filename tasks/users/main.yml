@@ -10,18 +10,19 @@
 
 - name: "Searching shells | servers-user"
   set_fact:
-    default_shell: "{{ server_shells.stdout|regex_search('.*/'+ default_shell + '.*') }}"
+    default_shell: "{{ server_shells.stdout | regex_search('.*/'+ default_shell + '.*') }}"
     default_server_shell: "{{ server_shells.stdout_lines[1] }}"
 
 - name: "Select default shell for server | servers-user"
   set_fact:
-    default_shell: "{{ (default_shell|length>0) | ternary(default_shell, default_server_shell) }}"
+    default_shell: "{{ (default_shell | length>0) | ternary(default_shell, default_server_shell) }}"
 
 - name: "Define system groups array | servers-user"
   set_fact:
     ugroups: "{{ ugroup_raw.stdout_lines }}"
 
-- block:
+- name: "Create users | servers-user"
+  block:
     - include_tasks: user.yml
       loop: "{{ users | default([]) + global_users | default([]) }}"
       loop_control:

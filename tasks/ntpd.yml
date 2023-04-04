@@ -1,6 +1,6 @@
 - name: "Set default ntp service name | servers-ntp"
   set_fact:
-    ntp_service_name: "{{ ntp_service[ansible_os_family|lower]|default(ntp_service.default) }}"
+    ntp_service_name: "{{ ntp_service[ansible_os_family | lower] | default(ntp_service.default) }}"
 
 - name: "Check systemd-timesyncd | servers-ntp"
   stat:
@@ -14,9 +14,6 @@
         path: "/lib/systemd/system/systemd-timesyncd.service.d/disable-with-time-daemon.conf"
         state: "absent"
       notify: restart-systemd-tymesyncd
-
-    - name: "Get ntpd status | servers-ntp"
-      service_facts:
 
     - name: "Disable ntpd | servers-ntp"
       systemd:

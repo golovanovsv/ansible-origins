@@ -25,7 +25,9 @@ users:
   description: "Anny admin"
   state: "present"
   ssh_keys:
+  # yamllint disable-line rule:line-length
   - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQCvSoOl696VC7uyLikfSMtATlZeZt7FQqdct+lN7jLdvJRtkMDkzniTIRfAmrOzbrV0ma4DWMznG2h5cwUgs4M3J1D42zOjZtBOIro89P1wKOt2GDigXX7CsCfqYNvRHrnjhOpjT2bPffu+LBI6/VRMXe/j/WYsIKZZkEW0hcHtGQ== anny@work"
+  # yamllint disable-line rule:line-length
   - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC1dLN12gWXYhvnf+tfBKvOMflaTyoZ/VW1sEgZ5FeqYtN1zGHx6luAfNTaV4qUNpvbpHvKAzxv4YjV4ku8YG1xHNMGNlc7A0fqfwULguOHEsLpHeYEmUekWTZbopZn1ncNsfyeehKf/p3f8j6kS8L3aBmJw+8+6qlGQBxq+ksSw0ueuzKW5oRBkUfL2b+2L2pd40C8c9wIjf+B6QTmgj3ZjIdxWhXP2zQMS8J4I/gYQ+ydHk2mH9/K/m7HJgzDH/u8xt81TUVTdla/bCxctrUJydcyf77qUSCYejsbJf9JPh/6OFmz7LyBnYXgNeTCAdKN/evVi69nAo1kJ9cSH5V3 anny@home"
   dirs:
   - dir: ".test_dir"

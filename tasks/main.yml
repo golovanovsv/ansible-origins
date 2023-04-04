@@ -97,3 +97,11 @@
   when: node_exporter_enabled
   tags:
   - monitoring
+
+# Настраиваем NAT
+- name: "Configure NAT | servers-nat"
+  import_tasks: "nat.yml"
+  become: true
+  when: nat_rules | length > 0
+  tags:
+  - nat

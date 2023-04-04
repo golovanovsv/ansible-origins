@@ -1,0 +1,27 @@
+- name: "Create NAT rules | servers-nat"
+  iptables:
+    table: "nat"
+    chain: "POSTROUTING"
+    protocol: "{{ item.protocol | default(omit) }}"
+    source: "{{ item.from }}"
+    jump: "MASQUERADE"
+    out_interface: "{{ item.interface if item.interface is defined and item.interface | length > 0 else ansible_default_ipv4.interface }}"
+    state: "{{ item.state | default(omit) }}"
+  loop: "{{ nat_rules }}"
+  loop_control:
+    label: "{{ item.from }}"
+
+- name: "Create DNAT rules | servers-nat"
+  iptables:
+    table: "nat"
+    chain: "PREROUTING"
+    protocol: "{{ item.protocol | default(omit) }}"
+    destination: "{{ item.destination | default(omit) }}"
+    destination_port: "{{ item.port | default(omit) }}"
+    jump: "DNAT"
+    in_interface: "{{ item.interface if item.interface is defined and item.interface | length > 0 else ansible_default_ipv4.interface }}"
+    to_destination: "{{ item.target }}"
+    state: "{{ item.state | default(omit) }}"
+  loop: "{{ dnat_rules }}"
+  loop_control:
+    label: "{{ item.target }}"
