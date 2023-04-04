@@ -25,3 +25,8 @@
   loop: "{{ dnat_rules }}"
   loop_control:
     label: "{{ item.target }}"
+
+- name: "Save rules | servers-nat"
+  community.general.iptables_state:
+    state: "saved"
+    path: "/etc/iptables/rules.v4"
