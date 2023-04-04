@@ -5,6 +5,11 @@ driver:
 # 503 is feature-bug - https://github.com/ansible/ansible-lint/issues/419
 lint: "ansible-lint . -x 306 -x 503 --exclude .gitlab-ci.yml"
 platforms:
+  - name: ubuntu-2204
+    image: golovanovsv/ubuntu:22.04-systemd
+    command: /lib/systemd/systemd
+    pre_build_image: true
+    privileged: true
   - name: ubuntu-2004
     image: golovanovsv/ubuntu:20.04-systemd
     command: /lib/systemd/systemd
@@ -15,12 +20,16 @@ platforms:
     command: /lib/systemd/systemd
     pre_build_image: true
     privileged: true
-  - name: debian-9
-    image: golovanovsv/debian:9-systemd
+  - name: debian-11
+    image: golovanovsv/debian:11-systemd
     pre_build_image: true
     privileged: true
   - name: debian-10
     image: golovanovsv/debian:10-systemd
+    pre_build_image: true
+    privileged: true
+  - name: debian-9
+    image: golovanovsv/debian:9-systemd
     pre_build_image: true
     privileged: true
   - name: amazon2

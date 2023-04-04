@@ -27,6 +27,6 @@
     - unzip
     when: ansible_pkg_mgr == "yum"
 
-  - name: "basic"
+  - name: "ansible-origins"
     include_role:
-      name: "basic"
+      name: "ansible-origins"
