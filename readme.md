@@ -4,6 +4,12 @@
 
 Параметры по-умолчанию находятяся в [defaults](defaults/main.yml).
 
+## Требования
+
+Требует следующих коллекций ansible:
+
+- community.general (`ansible-galaxy collection install community.general`)
+
 ## Ограничения
 
 Роль работает только со следующими дистрибутивами Linux:
@@ -25,3 +31,4 @@
 - Настройка locale [locales.yml](tasks/locales.yml) (tag: locales)
 - Дополнительных конфигурационных файлов [extra_configs.yml](tasks/extra_configs.yml) (tag: extra_configs)
 - Настройка node-exporter`а [host.yml](tasks/monitoring/host.yml) (tag: monitoring)
+- Настрока правил NAT/DNAT [nat.yml](tasks/nat.yml) (tag: nat)

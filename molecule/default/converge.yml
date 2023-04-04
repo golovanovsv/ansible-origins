@@ -5,7 +5,7 @@
   - name: "include ansible-servers vars"
     include_vars:
       file: "vars.yml"
-  
+
   - name: "install software | apt"
     apt:
       name: "{{ item }}"

@@ -48,12 +48,17 @@
       get_url:
         url: "https://bootstrap.pypa.io/pip/2.7/get-pip.py"
         dest: "/tmp/get-pip.py"
+        mode: 0755
       when: python2_result.stdout_lines|length>0
 
     - name: "Download pip installer | servers-python"
       get_url:
         url: "https://bootstrap.pypa.io/get-pip.py"
+        # ERROR: This script does not work on Python 3.6 The minimum supported Python version is 3.7.
+        #  Please use https://bootstrap.pypa.io/pip/3.6/get-pip.py instead.
+        # url: "https://bootstrap.pypa.io/pip/3.6/get-pip.py"
         dest: "/tmp/get-pip.py"
+        mode: 0755
       when: python3_result.stdout_lines|length>0
 
     - name: "Install pip2 | servers-python"
