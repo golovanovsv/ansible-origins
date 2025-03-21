@@ -22,14 +22,17 @@ platforms:
     privileged: true
   - name: debian-12
     image: golovanovsv/debian:12-systemd
+    command: /lib/systemd/systemd
     pre_build_image: true
     privileged: true
   - name: debian-11
     image: golovanovsv/debian:11-systemd
+    command: /lib/systemd/systemd
     pre_build_image: true
     privileged: true
   - name: debian-10
     image: golovanovsv/debian:10-systemd
+    command: /lib/systemd/systemd
     pre_build_image: true
     privileged: true
   - name: amazon2

@@ -62,10 +62,15 @@ default_motd: |
 default_timezone: "UTC"
 
 ### Настройки DNS
+# Режим работы:
+#   systemd - режим работы через systemd-resolved
+#   resolve - режим работы через /etc/resolve.conf
+dns_mode: "systemd"
 dns_servers: []
 #  - 77.88.8.8 # Яндекс.DNS
 #  - 8.8.8.8   # Google DNS
 dns_timeout: 1
+dns_search: []
 
 ### Репозитории ПО
 repositories_apt: []
