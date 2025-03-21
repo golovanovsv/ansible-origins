@@ -15,7 +15,7 @@
 
 # Настраиваем resolv.conf
 - name: "Configure resolve.conf | servers-dns"
-  import_tasks: "resolv.yml"
+  import_tasks: "dns.yml"
   become: true
   when: dns_servers|length>0
   tags:
